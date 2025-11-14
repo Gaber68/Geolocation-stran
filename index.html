@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>28. vaja: API - Application programming interface</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        padding: 20px;
+        text-align: center;
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 20px;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    #demo {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #444;
+    }
+
+    #map {
+        width: 90%;
+        height: 400px;
+        margin: 0 auto;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Tvoja Lokacija</h1>
+<p>Klikni gumb da dobiš svoje koordinate in da lahko vidiš svojo pozicijo na zemljevidu</p>
+
+<button onclick="getLocation()">Pridobi mojo lokacijo</button>
+
+<p id="demo"></p>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const x = document.getElementById("demo");
+let map;
+let marker;
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(success, error);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function success(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  x.innerHTML = "Zemljepisna širina: " + lat + "<br>Zemljepisna dolžina: " + lon;
+
+  if (!map) {
+    map = L.map('map').setView([lat, lon], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    marker = L.marker([lat, lon]).addTo(map);
+  } else {
+    marker.setLatLng([lat, lon]);
+    map.setView([lat, lon]);
+  }
+}
+
+function error(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML = "User denied the request for Geolocation.";
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML = "Location information is unavailable.";
+      break;
+    case error.TIMEOUT:
+      x.innerHTML = "The request to get user location timed out.";
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML = "An unknown error occurred.";
+      break;
+  }
+}
+</script>
+
+</body>
+</html>
